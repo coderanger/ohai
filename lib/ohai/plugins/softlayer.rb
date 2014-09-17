@@ -65,7 +65,16 @@ Ohai.plugin(:SoftLayer) do
       Ohai::Log.debug("looks_like_softlayer? == true")
       softlayer Mash.new
       SOFTLAYER_METADATA_KEYS.each do |key|
-        softlayer[key] = http_client.get(SOFTLAYER_METADATA_API + softlayey_key(key))
+        response = http_client.get(SOFTLAYER_METADATA_API + softlayey_key(key))
+        softlayer[key] = case response.code
+        when '200'
+          response.body
+        when '404'
+          Ohai::Log.debug("Encountered 404 response retreiving SoftLayer metadata path: #{key} ; continuing.")
+          nil
+        else
+          raise "Encountered error retrieving SoftLayer metadata (#{key} returned #{response.code} response)"
+        end
       end
       # Standard keys to make life a little easier
       softlayer[:public_ipv4] = softlayer[:primary_ip_address]
