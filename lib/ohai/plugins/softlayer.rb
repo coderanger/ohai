@@ -62,6 +62,7 @@ Ohai.plugin(:SoftLayer) do
 
   collect_data do
     if looks_like_softlayer?
+      Ohai::Log.debug("looks_like_softlayer? == true")
       softlayer Mash.new
       SOFTLAYER_METADATA_KEYS.each do |key|
         softlayer[key] = http_client.get(SOFTLAYER_METADATA_API + softlayey_key(key))
