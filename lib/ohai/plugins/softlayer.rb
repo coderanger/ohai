@@ -49,7 +49,7 @@ Ohai.plugin(:SoftLayer) do
   end
 
   def softlayey_key(key)
-    'get' + key.split('_').map(&:capitalize!).join('')
+    'get' + key.split('_').map(&:capitalize!).join('') + '.txt'
   end
 
   def http_client
