@@ -241,7 +241,29 @@ Ohai.plugin(:Cloud) do
     cloud[:provider] = "cloudstack"
   end
 
-  collect_data do    
+  # ----------------------------------------
+  # softlayer
+  # ----------------------------------------
+
+  # Is current cloud softlayer?
+  #
+  # === Return
+  # true:: If softlayer Hash is defined
+  # false:: Otherwise
+  def on_softlayer?
+    softlayer != nil
+  end
+
+  # Fill cloud hash with softlayer values
+  def get_softlayer_values
+    cloud[:public_ips] << softlayer['public_ipv4']
+    cloud[:private_ips] << softlayer['local_ipv4']
+    cloud[:public_ipv4] = softlayer['public_ipv4']
+    cloud[:local_ipv4] = softlayer['local_ipv4']
+    cloud[:provider] = "softlayer"
+  end
+
+  collect_data do
     # setup gce cloud
     if on_gce?
       create_objects
@@ -287,6 +309,12 @@ Ohai.plugin(:Cloud) do
     if on_cloudstack?
       create_objects
       get_cloudstack_values
+    end
+
+    # setup softlayer cloud
+    if on_softlayer?
+      create_objects
+      get_softlayer_values
     end
   end
 end

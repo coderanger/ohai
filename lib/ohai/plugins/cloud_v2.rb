@@ -270,6 +270,26 @@ Ohai.plugin(:CloudV2) do
     @cloud_attr_obj.provider = "azure"
   end
 
+  # ----------------------------------------
+  # softlayer
+  # ----------------------------------------
+
+  # Is current cloud softlayer?
+  #
+  # === Return
+  # true:: If softlayer Hash is defined
+  # false:: Otherwise
+  def on_softlayer?
+    softlayer != nil
+  end
+
+  # Fill cloud hash with softlayer values
+  def get_softlayer_values
+    @cloud_attr_obj.add_ipv4_addr(softlayer['public_ipv4'], :public)
+    @cloud_attr_obj.add_ipv4_addr(softlayer['local_ipv4'], :private)
+    @cloud_attr_obj.provider = "softlayer"
+  end
+
   collect_data do
     require "ipaddr"
 
@@ -282,6 +302,7 @@ Ohai.plugin(:CloudV2) do
     get_eucalyptus_values if on_eucalyptus?
     get_openstack_values if on_openstack?
     get_azure_values if on_azure?
+    get_softlayer_values if on_softlayer?
 
     # set node[:cloud] hash here
     cloud_v2 @cloud_attr_obj.cloud_mash
