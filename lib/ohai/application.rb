@@ -39,6 +39,10 @@ class Ohai::Application
     :description  => "Set the log file location, defaults to STDOUT - recommended for daemonizing",
     :proc         => nil
 
+  option :hints_directory,
+    :long         => "--hints-directory DIRECTORY",
+    :description  => "A directory to add to the Ohai hints path",
+
   option :help,
     :short        => "-h",
     :long         => "--help",
@@ -77,6 +81,9 @@ class Ohai::Application
     Ohai::Config.merge!(config)
     if Ohai::Config[:directory]
       Ohai::Config[:plugin_path] << Ohai::Config[:directory]
+    end
+    if Ohai::Config[:hints_directory]
+      Ohai::Config[:hints_path] << Ohai::Config[:hints_directory]
     end
   end
 
