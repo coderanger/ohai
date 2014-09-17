@@ -49,7 +49,7 @@ Ohai.plugin(:SoftLayer) do
   end
 
   def softlayey_key(key)
-    'get' + key.split('_').map(&:capitalize!).join('') + '.txt'
+    'get' + key.split('_').map(&:capitalize!).join('') + '.json'
   end
 
   def http_client
@@ -68,7 +68,11 @@ Ohai.plugin(:SoftLayer) do
         response = http_client.get(SOFTLAYER_METADATA_API + softlayey_key(key))
         softlayer[key] = case response.code
         when '200'
-          response.body
+          begin
+            FFI_Yajl::Parser.parse(response.body)
+          rescue FFI_Yajl::ParseError => e
+            response.body
+          end
         when '404', '422'
           Ohai::Log.debug("Encountered #{response.code} response retreiving SoftLayer metadata path: #{key} ; continuing.")
           nil
