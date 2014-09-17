@@ -58,7 +58,6 @@ Ohai.plugin(:SoftLayer) do
       use_ssl: true,
       verify_mode: OpenSSL::SSL::VERIFY_PEER,
     )
-    end
   end
 
   collect_data do
