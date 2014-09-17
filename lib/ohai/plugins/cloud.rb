@@ -25,6 +25,7 @@ Ohai.plugin(:Cloud) do
   depends "openstack"
   depends "azure"
   depends "cloudstack"
+  depends "softlayer"
 
   # Make top-level cloud hashes
   #

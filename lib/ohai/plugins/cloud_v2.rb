@@ -24,6 +24,7 @@ Ohai.plugin(:CloudV2) do
   depends "linode"
   depends "openstack"
   depends "azure"
+  depends "softlayer"
 
   # Class to help enforce the interface exposed to node[:cloud] (OHAI-542)
   #
