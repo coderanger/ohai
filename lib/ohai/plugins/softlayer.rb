@@ -69,8 +69,8 @@ Ohai.plugin(:SoftLayer) do
         softlayer[key] = case response.code
         when '200'
           response.body
-        when '404'
-          Ohai::Log.debug("Encountered 404 response retreiving SoftLayer metadata path: #{key} ; continuing.")
+        when '404', '422'
+          Ohai::Log.debug("Encountered #{response.code} response retreiving SoftLayer metadata path: #{key} ; continuing.")
           nil
         else
           raise "Encountered error retrieving SoftLayer metadata (#{key} returned #{response.code} response)"
