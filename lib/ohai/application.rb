@@ -41,7 +41,7 @@ class Ohai::Application
 
   option :hints_directory,
     :long         => "--hints-directory DIRECTORY",
-    :description  => "A directory to add to the Ohai hints path",
+    :description  => "A directory to add to the Ohai hints path"
 
   option :help,
     :short        => "-h",
