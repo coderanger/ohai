@@ -17,7 +17,7 @@
 require 'net/http'
 
 Ohai.plugin(:SoftLayer) do
-  providers "softlayer"
+  provides "softlayer"
 
   SOFTLAYER_METADATA_ADDR = 'api.service.softlayer.com'
   SOFTLAYER_METADATA_API = '/rest/v3/SoftLayer_Resource_Metadata/'
