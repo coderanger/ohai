@@ -53,10 +53,11 @@ Ohai.plugin(:SoftLayer) do
   end
 
   def http_client
-    Net::HTTP.start(SOFTLAYER_METADATA_ADDR, 443).tap do |h|
-      h.read_timeout = 600
-      h.use_ssl = true
-      h.verify_mode = OpenSSL::SSL::VERIFY_PEER
+    Net::HTTP.start(SOFTLAYER_METADATA_ADDR, 443,
+      read_timeout: 600,
+      use_ssl: true,
+      verify_mode: OpenSSL::SSL::VERIFY_PEER,
+    )
     end
   end
 
@@ -70,8 +71,6 @@ Ohai.plugin(:SoftLayer) do
       # Standard keys to make life a little easier
       softlayer[:public_ipv4] = softlayer[:primary_ip_address]
       softlayer[:local_ipv4] = softlayer[:primary_backend_ip_address]
-    else
-      Ohai::Log.debug("looks_like_softlayer? == false")
     end
   end
 
