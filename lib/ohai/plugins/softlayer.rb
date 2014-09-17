@@ -70,6 +70,8 @@ Ohai.plugin(:SoftLayer) do
       # Standard keys to make life a little easier
       softlayer[:public_ipv4] = softlayer[:primary_ip_address]
       softlayer[:local_ipv4] = softlayer[:primary_backend_ip_address]
+    else
+      Ohai::Log.debug("looks_like_softlayer? == false")
     end
   end
 
