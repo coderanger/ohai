@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 
+require 'ffi_yajl'
 require 'net/http'
 
 Ohai.plugin(:SoftLayer) do
@@ -69,7 +70,7 @@ Ohai.plugin(:SoftLayer) do
         softlayer[key] = case response.code
         when '200'
           begin
-            FFI_Yajl::Parser.parse(response.body)
+            FFI_Yajl::Parser.parse('[' + response.body + ']').first
           rescue FFI_Yajl::ParseError => e
             response.body
           end
