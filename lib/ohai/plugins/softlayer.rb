@@ -64,7 +64,9 @@ Ohai.plugin(:SoftLayer) do
   end
 
   def retreive_key(key, param=nil)
-    response = http_client.get(SOFTLAYER_METADATA_API + softlayey_key(key, param))
+    path = SOFTLAYER_METADATA_API + softlayey_key(key, param)
+    Ohai::Log.debug("Reteiving SoftLayer metadata from #{path}")
+    response = http_client.get(path)
     softlayer[key] = case response.code
     when '200'
       begin
@@ -89,6 +91,7 @@ Ohai.plugin(:SoftLayer) do
         softlayer[key] = retreive_key(key)
       end
       mac_addresses = (softlayer[:frontend_mac_addresses] || []) + (softlayer[:backend_mac_addresses] || [])
+      Ohai::Log.debug("Found MAC addresses: #{mac_addresses.join(', ')}")
       SOFTLAYER_NETWORK_METADATA_KEYS.each do |key|
         softlayer[key] = {}
         mac_addresses.each do |mac|
