@@ -70,6 +70,8 @@ Ohai.plugin(:SoftLayer) do
     softlayer[key] = case response.code
     when '200'
       begin
+        # ffi-yajl can't parse simple values so wrap in an array for now.
+        # Pending https://github.com/opscode/ffi-yajl/issues/16
         FFI_Yajl::Parser.parse('[' + response.body + ']').first
       rescue FFI_Yajl::ParseError => e
         response.body
