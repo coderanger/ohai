@@ -65,7 +65,7 @@ Ohai.plugin(:SoftLayer) do
 
   def retreive_key(key, param=nil)
     path = SOFTLAYER_METADATA_API + softlayey_key(key, param)
-    Ohai::Log.debug("Reteiving SoftLayer metadata from #{path}")
+    Ohai::Log.debug("Reteiving SoftLayer metadata from https://#{SOFTLAYER_METADATA_ADDR}#{path}")
     response = http_client.get(path)
     softlayer[key] = case response.code
     when '200'
