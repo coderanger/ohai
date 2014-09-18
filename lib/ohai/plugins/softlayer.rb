@@ -74,13 +74,11 @@ Ohai.plugin(:SoftLayer) do
           rescue FFI_Yajl::ParseError => e
             response.body
           end
-        when '404', '422'
+        when '404', '422', '500'
           Ohai::Log.debug("Encountered #{response.code} response retreiving SoftLayer metadata path: #{key} ; continuing.")
           nil
         else
-          unless key == 'tags' && response.code == '500' # SL thinks not having tags is a 500
-            Ohai::Log.error("Encountered error retrieving SoftLayer metadata (#{key} returned #{response.code} response)")
-          end
+          Ohai::Log.error("Encountered error retrieving SoftLayer metadata (#{key} returned #{response.code} response)")
           nil
         end
       end
