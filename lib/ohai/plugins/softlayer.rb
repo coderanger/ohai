@@ -34,13 +34,15 @@ Ohai.plugin(:SoftLayer) do
     primary_backend_ip_address
     primary_ip_address
     provision_state
-    router
     tags
     user_metadata
-    vlan_ids
-    vlans
     service_resource
     service_resources
+  }
+  SOFTLAYER_NETWORK_METADATA_KEYS = %w{
+    router
+    vlan_ids
+    vlans
   }
 
   # For bare metal there is no way to auto-detect
@@ -49,8 +51,8 @@ Ohai.plugin(:SoftLayer) do
     hint?('softlayer')
   end
 
-  def softlayey_key(key)
-    'get' + key.split('_').map(&:capitalize!).join('') + '.json'
+  def softlayey_key(key, param=nil)
+    'get' + key.split('_').map(&:capitalize!).join('') + (param ? '/'+param : '') + '.json'
   end
 
   def http_client
@@ -61,25 +63,36 @@ Ohai.plugin(:SoftLayer) do
     )
   end
 
+  def retreive_key(key, param=nil)
+    response = http_client.get(SOFTLAYER_METADATA_API + softlayey_key(key, param))
+    softlayer[key] = case response.code
+    when '200'
+      begin
+        FFI_Yajl::Parser.parse('[' + response.body + ']').first
+      rescue FFI_Yajl::ParseError => e
+        response.body
+      end
+    when '404', '422', '500'
+      Ohai::Log.debug("Encountered #{response.code} response retreiving SoftLayer metadata path: #{key} ; continuing.")
+      nil
+    else
+      Ohai::Log.error("Encountered error retrieving SoftLayer metadata (#{key} returned #{response.code} response)")
+      nil
+    end
+  end
+
   collect_data do
     if looks_like_softlayer?
       Ohai::Log.debug("looks_like_softlayer? == true")
       softlayer Mash.new
       SOFTLAYER_METADATA_KEYS.each do |key|
-        response = http_client.get(SOFTLAYER_METADATA_API + softlayey_key(key))
-        softlayer[key] = case response.code
-        when '200'
-          begin
-            FFI_Yajl::Parser.parse('[' + response.body + ']').first
-          rescue FFI_Yajl::ParseError => e
-            response.body
-          end
-        when '404', '422', '500'
-          Ohai::Log.debug("Encountered #{response.code} response retreiving SoftLayer metadata path: #{key} ; continuing.")
-          nil
-        else
-          Ohai::Log.error("Encountered error retrieving SoftLayer metadata (#{key} returned #{response.code} response)")
-          nil
+        softlayer[key] = retreive_key(key)
+      end
+      mac_addresses = (softlayer[:frontend_mac_addresses] || []) + (softlayer[:backend_mac_addresses] || [])
+      SOFTLAYER_NETWORK_METADATA_KEYS.each do |key|
+        softlayer[key] = {}
+        mac_addresses.each do |mac|
+          softlayer[key][mac] = retreive_key(key, mac)
         end
       end
       # Standard keys to make life a little easier
