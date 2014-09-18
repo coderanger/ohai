@@ -78,7 +78,9 @@ Ohai.plugin(:SoftLayer) do
           Ohai::Log.debug("Encountered #{response.code} response retreiving SoftLayer metadata path: #{key} ; continuing.")
           nil
         else
-          raise "Encountered error retrieving SoftLayer metadata (#{key} returned #{response.code} response)"
+          unless key == 'tags' && response.code == '500' # SL thinks not having tags is a 500
+            Ohai::Log.error("Encountered error retrieving SoftLayer metadata (#{key} returned #{response.code} response)")
+          end
         end
       end
       # Standard keys to make life a little easier
