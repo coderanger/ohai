@@ -90,12 +90,12 @@ Ohai.plugin(:SoftLayer) do
       SOFTLAYER_METADATA_KEYS.each do |key|
         softlayer[key] = retreive_key(key)
       end
-      mac_addresses = (softlayer[:frontend_mac_addresses] || []) + (softlayer[:backend_mac_addresses] || [])
+      mac_addresses = ((softlayer[:frontend_mac_addresses] || []) + (softlayer[:backend_mac_addresses] || [])).uniq
       Ohai::Log.debug("Found MAC addresses: #{mac_addresses.join(', ')}")
       SOFTLAYER_NETWORK_METADATA_KEYS.each do |key|
-        softlayer[key] = {}
-        mac_addresses.each do |mac|
-          softlayer[key][mac] = retreive_key(key, mac)
+        softlayer[key] = mac_addresses.inject({}) do |memo, mac|
+          memo[mac] = retreive_key(key, mac)
+          memo
         end
       end
       # Standard keys to make life a little easier
